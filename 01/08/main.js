@@ -26,13 +26,13 @@ function main() {
 	spotLight.position.set(0, 0, 5);
 	scene.add(spotLight);
 
-	// 3 加入立方体
+	// 4 加入渲染对象
 	var geometry = new THREE.BoxGeometry( 2, 2, 2 );
 	var material = new THREE.MeshPhongMaterial( { // Phong材质
-		color: 0xff0000, // 颜色
+		color: 0xffffff, // 颜色
 		shininess: 10000, // 高光亮度
 		specular: 0xffff00, // 高光颜色
-		map: THREE.ImageUtils.loadTexture('./face.jpg') // 纹理
+		map: new THREE.TextureLoader().load('./face.jpg') // 纹理
 	} );
 	var cube = new THREE.Mesh( geometry, material );
 	cube.castShadow = true;// 产生阴影

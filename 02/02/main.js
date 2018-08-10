@@ -1,8 +1,9 @@
 /**
- * 加入高光
- * 材质：Phong
+ * 自定义shader
+ * 1 传入纹理
+ * 2 实时更新颜色
+ * 3 混合纹理颜色和实时变化的颜色
  * */
-
 function main() {
 	// 1 创建场景
 	var scene = new THREE.Scene();
@@ -16,41 +17,43 @@ function main() {
 	var ambientLight = new THREE.AmbientLight(0x333333);// 环境光
 	scene.add(ambientLight);
 	var dirLight = new THREE.DirectionalLight();// 平行光
-	dirLight.castShadow = true;// 产生阴影
 	scene.add(dirLight);
-	var spotLight = new THREE.SpotLight(0xffffff);// 聚光灯
-	spotLight.position.set(0, 0, 5);
-	scene.add(spotLight);
 
-	// 4 加入渲染对象
+	// 4 加入立方体
+	var loader = new THREE.TextureLoader;
+	var tex = loader.load("./face.jpg");
+	var uniforms = {
+		time: {
+			type: "f",
+			value: 1.0
+		},
+		texture: {
+			type: "t",
+			value: tex
+		}
+	};
 	var geometry = new THREE.BoxGeometry( 2, 2, 2 );
-	var material = new THREE.MeshPhongMaterial( { // Phong材质
-		color: 0xff0000, // 颜色
-		shininess: 10000, // 高光亮度
-		specular: 0xffff00, // 高光颜色
+	var material = new THREE.ShaderMaterial( {
+		uniforms: uniforms, // 传入uniform变量的值
+		vertexShader: document.getElementById( 'vertexShader' ).textContent,
+		fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 	} );
 	var cube = new THREE.Mesh( geometry, material );
-	cube.castShadow = true;// 产生阴影
 	scene.add( cube );
-
-	var plane = new THREE.Mesh(new THREE.PlaneGeometry(8, 8, 8, 8), new THREE.MeshLambertMaterial({color: 0xffffff}));
-	plane.rotation.x = -Math.PI / 2;
-	plane.position.y = -3;
-	plane.receiveShadow = true;// 接收阴影
-	scene.add(plane);
 
 	// 5 渲染
 	var renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor(0x4c4a48);
-	renderer.shadowMapEnabled = true;// 开启渲染器渲染阴影
-	renderer.shadowMapSoft = true;// 开启软阴影
 	document.body.appendChild( renderer.domElement );
 	renderer.render( scene, camera );
 
 	// 6 循环渲染
+	var clock = new THREE.Clock();
 	function render() {
 		requestAnimationFrame( render );
+		var delta = clock.getDelta();
+		uniforms.time.value += delta * 5;
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		cube.rotation.z += 0.01;
