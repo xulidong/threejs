@@ -3,6 +3,26 @@
  * 1 传入纹理
  * 2 实时更新颜色
  * 3 混合纹理颜色和实时变化的颜色
+ *
+ * 顶点着色器：
+ * threejs 内置 uniforms 和 attributes
+ * uniform mat4 modelMatrix; // = object.matrixWorld
+ * uniform mat4 modelViewMatrix; // = camera.matrixWorldInverse * object.matrixWorld
+ * uniform mat4 projectionMatrix; // = camera.projectionMatrix
+ * uniform mat4 viewMatrix; // = camera.matrixWorldInverse
+ * uniform mat3 normalMatrix;  // = inverse transpose of modelViewMatrix
+ * uniform vec3 cameraPosition; // = camera position in world space
+ *
+ * // default vertex attributes provided by Geometry and BufferGeometry
+ * attribute vec3 position;
+ * attribute vec3 normal;
+ * attribute vec2 uv;
+ *
+ *
+ * 片段着色器：
+ * uniform mat4 viewMatrix;
+ * uniform vec3 cameraPosition;
+ *
  * */
 function main() {
 	// 1 创建场景
@@ -13,13 +33,7 @@ function main() {
 	camera.position.z = 10;
 	camera.lookAt(scene.position);
 
-	// 3 光照
-	var ambientLight = new THREE.AmbientLight(0x333333);// 环境光
-	scene.add(ambientLight);
-	var dirLight = new THREE.DirectionalLight();// 平行光
-	scene.add(dirLight);
-
-	// 4 加入立方体
+	// 3 加入立方体
 	var loader = new THREE.TextureLoader;
 	var tex = loader.load("./face.jpg");
 	var uniforms = {
@@ -41,14 +55,14 @@ function main() {
 	var cube = new THREE.Mesh( geometry, material );
 	scene.add( cube );
 
-	// 5 渲染
+	// 4 渲染
 	var renderer = new THREE.WebGLRenderer();
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor(0x4c4a48);
 	document.body.appendChild( renderer.domElement );
 	renderer.render( scene, camera );
 
-	// 6 循环渲染
+	// 5 循环渲染
 	var clock = new THREE.Clock();
 	function render() {
 		requestAnimationFrame( render );

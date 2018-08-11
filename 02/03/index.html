@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>threejs</title>
+    <style>
+        body { margin: 0; }
+        canvas { width: 100%; height: 100% }
+    </style>
+</head>
+<body>
+</body>
+</html>
+<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vFragPos;
+    void main()
+    {
+        vUv = uv;
+        vNormal = normal;
+        vFragPos = vec3(modelViewMatrix * vec4(position, 1.0));
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        gl_Position = projectionMatrix * mvPosition;
+    }
+</script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+    uniform vec3 ambientLight;
+    uniform vec3 specularLight;
+    uniform vec3 diffuseLight;
+    uniform vec3 posLight;
+    uniform float shininess;
+    uniform sampler2D texture;
+    uniform sampler2D specular;
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vFragPos;
+    void main( void )
+    {
+        // ambient
+        vec3 tex = texture2D(texture, vUv).rgb;
+        vec3 ambient = ambientLight * tex;
+
+        // diffuse
+        vec3 lightDir = normalize(posLight - vFragPos);
+        float diff = max(dot(vNormal, lightDir), 0.0);
+        vec3 diffuse = diffuseLight * diff * tex;
+
+        // specular
+        vec3 viewDir = normalize(cameraPosition - vFragPos);
+        vec3 reflectDir = reflect(-lightDir, vNormal);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+        vec3 specular = specularLight * spec * texture2D(specular, vUv).rgb;
+
+        gl_FragColor = vec4((ambient + diffuse + specular), 1.0);
+    }
+</script>
+<script type="text/javascript" src="../../lib/threejs/three.min.js"></script>
+<script type="text/javascript" src="main.js"></script>
