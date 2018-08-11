@@ -23,6 +23,8 @@
  * uniform mat4 viewMatrix;
  * uniform vec3 cameraPosition;
  *
+ *
+ * 文档： https://threejs.org/docs/index.html#api/renderers/webgl/WebGLProgram
  * */
 function main() {
 	// 1 创建场景
